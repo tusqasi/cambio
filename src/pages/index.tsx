@@ -1,118 +1,188 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import Link from "next/link"
+import Image from "next/image"
+import { ChangeEvent, JSX, SVGProps, useState } from "react"
+import axios from "axios";
+function uploadImage(file: Blob, setScaledUrl: Function) {
+	const formData = new FormData();
+	formData.append("file", file as Blob);
+	console.log(formData);
+	const config = {
+		headers: {
+			"content-type": "multipart/form-data",
+		},
+	};
+	axios
+		.post(
+			`http://combio-compute.fly.dev/scale?scale=${0.1}`,
+			formData,
+			config
+		)
 
-const inter = Inter({ subsets: ['latin'] })
+		.then((data) => {
 
-export default function Home() {
-  return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+			const byteCharacters = atob(data.data.image);
+			const byteNumbers = new Array(byteCharacters.length);
+			for (let i = 0; i < byteCharacters.length; i++) {
+				byteNumbers[i] = byteCharacters.charCodeAt(i);
+			}
+			const byteArray = new Uint8Array(byteNumbers);
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+			let image = new Blob([byteArray], { type: data.data.type });
+			setScaledUrl(URL.createObjectURL(image));
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+		})
+		.catch((err) => console.error(err));
 }
+
+export default function Component() {
+	const [fileUrl, setFileUrl] = useState<string>();
+	// const [scaledFile, setScaledFile] = useState<File>();
+	const [scaledUrl, setScaledUrl] = useState<string>();
+	// const [scale, setScale] = useState<number>(50);
+	const fileAdded = (event: ChangeEvent<HTMLInputElement>) => {
+		if (event.target.files && event.target.files[0]) {
+			const file = event.target.files[0];
+			const file_url = URL.createObjectURL(event.target.files[0]);
+			setFileUrl(file_url);
+
+
+			uploadImage(file, setScaledUrl);
+
+		}
+	};
+	return (
+		<>
+			<div className=" h-[100svh] flex flex-col justify-between  ">
+				<header className="flex justify-center py-6 bg-[#ffffff]">
+					<h1 className="text-4xl font-bold  ">Cambio</h1>
+				</header>
+				<main className="container mx-auto max-w-3xl p-4">
+					<div className=" rounded-xl border  text-card-foreground shadow-sm p-4 ">
+						<span className="text-2xl font-semibold p-3 ">Upload Image</span>
+						<div className=" p-10 ">
+							<span className=" font-medium  text-sm ">
+								Choose Image
+							</span>
+							<input type="file"
+								className=" flex h-10 w-full rounded border shadow-sm  bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 "
+								onInput={fileAdded}
+								accept="image/*"
+							/>
+						</div>
+						<div className=" w-full h-full flex flex-col justify-center items-center   ">
+							{
+								fileUrl == null ?
+									<div className="  h-[400px] w-[400px] overflow-clip   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
+										<Image
+											src={"https://placehold.co/400x300/png?text=Preview%20here"}
+											width="400"
+											height="300"
+											alt="Preview" />
+									</div>
+									:
+									<div className="  h-[400px] w-[400px]   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
+										<Image
+											src={fileUrl}
+											width="400"
+											height="300"
+											alt="Image Preview"
+											className=" object-cover  "
+										/>
+									</div>
+
+							}
+						</div>
+					</div>
+					<div className=" p-3 ">
+					</div>
+					<div className=" flex flex-col justify-center items-center rounded-xl border  text-card-foreground shadow-sm p-4 ">
+						<div className="flex flex-col justify-start items-start w-full p-3 ">
+							<span className="text-2xl font-semibold  ">Processed Image</span>
+						</div>
+						<div className=" w-full h-full  flex flex-col justify-center items-center   ">
+							{
+								scaledUrl == null ?
+									<div className="  h-[400px] w-[400px] overflow-clip   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
+										<Image
+											src={"https://placehold.co/400x300/png?text=Processed%20Preview%20Here"}
+											width="400"
+											height="300"
+											alt="Preview" />
+									</div>
+									:
+									<div className="  h-[400px] w-[400px]   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
+										<Image
+											src={scaledUrl}
+											width="400"
+											height="300"
+											alt="Uploaded Image Preview"
+											className=" object-cover  "
+										/>
+									</div>
+
+							}
+						</div>
+						<div className=" p-1">
+							<button
+								className=" text-white font-medium text-sm bg-black p-3 rounded-md " >
+								Download
+							</button>
+						</div>
+					</div>
+				</main >
+				<footer className=" flex justify-center gap-6 p-6 bg-black">
+					<Link href="#">
+						<TwitterIcon className="w-4 h-4 text-white" />
+					</Link>
+					<Link href="#">
+						<LinkedinIcon className="w-4 h-4 text-white" />
+					</Link>
+				</footer>
+			</div >
+		</>
+	)
+}
+
+
+
+function LinkedinIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			{...props}
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
+			<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+			<rect width="4" height="12" x="2" y="9" />
+			<circle cx="4" cy="4" r="2" />
+		</svg>
+	)
+}
+
+
+function TwitterIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			{...props}
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
+			<path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+		</svg>
+	)
+}
+
