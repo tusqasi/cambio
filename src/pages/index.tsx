@@ -90,7 +90,7 @@ export default function Component() {
 											toast.warning("Scale wrong");
 											return;
 										}
-										if (imageFile != undefined) {
+										if (imageFileUrl == "" ) {
 											toast.warning("No image file given to upload");
 											return;
 										}
