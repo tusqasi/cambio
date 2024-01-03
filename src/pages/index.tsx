@@ -2,7 +2,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { ChangeEvent, JSX, SVGProps, useState } from "react"
 import axios from "axios";
-function uploadImage(file: Blob, setScaledUrl: Function) {
+import { Toaster, toast } from "sonner";
+
+function uploadImage(file: any, setScaledUrl: Function, scale: number) {
 	const formData = new FormData();
 	formData.append("file", file as Blob);
 	console.log(formData);
@@ -13,7 +15,7 @@ function uploadImage(file: Blob, setScaledUrl: Function) {
 	};
 	axios
 		.post(
-			`https://combio-compute.fly.dev/scale?scale=${0.1}`,
+			`https://combio-compute.fly.dev/scale?scale=${(scale / 100)}`,
 			formData,
 			config
 		)
@@ -29,29 +31,28 @@ function uploadImage(file: Blob, setScaledUrl: Function) {
 
 			let image = new Blob([byteArray], { type: data.data.type });
 			setScaledUrl(URL.createObjectURL(image));
-
+			toast.success("Resized image")
 		})
 		.catch((err) => console.error(err));
 }
 
 export default function Component() {
 	const [fileUrl, setFileUrl] = useState<string>();
+	const [imageFile, setImageFile] = useState<File>();
 	// const [scaledFile, setScaledFile] = useState<File>();
 	const [scaledUrl, setScaledUrl] = useState<string>();
-	// const [scale, setScale] = useState<number>(50);
+	const [scalePercent, setScalePercent] = useState<number>(50);
 	const fileAdded = (event: ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files[0]) {
 			const file = event.target.files[0];
 			const file_url = URL.createObjectURL(event.target.files[0]);
 			setFileUrl(file_url);
-
-
-			uploadImage(file, setScaledUrl);
-
+			setImageFile(file);
 		}
 	};
 	return (
 		<>
+			<Toaster />
 			<div className=" h-[100svh] flex flex-col justify-between  ">
 				<header className="flex justify-center py-6 bg-[#ffffff]">
 					<h1 className="text-4xl font-bold  ">Cambio</h1>
@@ -59,15 +60,47 @@ export default function Component() {
 				<main className="container mx-auto max-w-3xl p-4">
 					<div className=" rounded-xl border  text-card-foreground shadow-sm p-4 ">
 						<span className="text-2xl font-semibold p-3 ">Upload Image</span>
-						<div className=" p-10 ">
-							<span className=" font-medium  text-sm ">
-								Choose Image
-							</span>
-							<input type="file"
-								className=" flex h-10 w-full rounded border shadow-sm  bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 "
-								onInput={fileAdded}
-								accept="image/*"
-							/>
+						<div className="flex flex-col p-10  gap-4 ">
+							<label className=" font-medium  text-sm ">
+								Choose Image <span className="font-light  text-gray-600 "> (.png, .jpg) </span>
+								<input type="file"
+									className=" flex h-10 w-full rounded border shadow-sm  bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground  focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 "
+									onInput={fileAdded}
+									accept="image/*"
+								/>
+							</label>
+							<label className=" font-medium  text-sm ">
+								Set scale in percent <span className="font-light  text-gray-600 "> (140%, 50% ) </span>
+								<input type="number"
+									className=" flex h-10 w-full rounded border shadow-sm  bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 "
+									onChange={(e) => {
+										setScalePercent(parseInt(e.target.value));
+									}}
+									value={scalePercent}
+									placeholder="Scale"
+
+								/>
+							</label>
+							<div className="   w-full  flex flex-col  items-center">
+								<button
+									disabled={imageFile != undefined}
+									className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+									onClick={() => {
+										if (!Number.isInteger(scalePercent)) {
+											toast.warning("Scale wrong");
+											return;
+										}
+										if (imageFile != undefined) {
+											toast.warning("No image file given to upload");
+											return;
+										}
+
+										uploadImage(imageFile, setScaledUrl, scalePercent);
+									}}
+								>
+									Resize
+								</button>
+							</div>
 						</div>
 						<div className=" w-full h-full flex flex-col justify-center items-center   ">
 							{
@@ -124,7 +157,8 @@ export default function Component() {
 						</div>
 						<div className=" p-1">
 							<button
-								className=" text-white font-medium text-sm bg-black p-3 rounded-md " >
+								className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+							>
 								Download
 							</button>
 						</div>
