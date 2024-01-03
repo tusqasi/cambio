@@ -13,7 +13,7 @@ function uploadImage(file: Blob, setScaledUrl: Function) {
 	};
 	axios
 		.post(
-			`http://combio-compute.fly.dev/scale?scale=${0.1}`,
+			`https://combio-compute.fly.dev/scale?scale=${0.1}`,
 			formData,
 			config
 		)
