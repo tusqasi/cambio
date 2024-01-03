@@ -106,7 +106,7 @@ export default function Component() {
 											return;
 										}
 
-										uploadImage(imageFile, setScaledUrl, scalePercent, scrollRef);
+										uploadImage(imageFile, setScaledUrl, scalePercent, scrollRef as MutableRefObject<HTMLDivElement>);
 									}}
 								>
 									Resize
@@ -140,7 +140,7 @@ export default function Component() {
 					<div className=" p-3 ">
 					</div>
 					<div className=" flex flex-col justify-center items-center rounded-xl border  text-card-foreground shadow-sm p-4 "
-						ref={scrollRef}>
+						ref={scrollRef as MutableRefObject<HTMLDivElement>}>
 						<div className="flex flex-col justify-start items-start w-full p-3 ">
 							<span className="text-2xl font-semibold  ">Processed Image</span>
 						</div>
