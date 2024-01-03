@@ -63,6 +63,7 @@ export default function Component() {
 				<meta property="og:description" content="Cambio - An image resize utility made in nextjs" />
 				<meta property="og:type" content="website" />
 				<meta property="og:url" content="https://cambio-eight.vercel.app/" />
+				<meta property="og:image" content="https://i.imgur.com/QDHBAhf.png" />
 			</Head>
 			<div className=" h-[100svh] flex flex-col justify-between  ">
 				<header className="flex justify-center py-6 bg-[#ffffff]">
