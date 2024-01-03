@@ -37,7 +37,7 @@ function uploadImage(file: any, setScaledUrl: Function, scale: number) {
 }
 
 export default function Component() {
-	const [fileUrl, setFileUrl] = useState<string>();
+	const [imageFileUrl, setImageFileUrl] = useState<string>("");
 	const [imageFile, setImageFile] = useState<File>();
 	// const [scaledFile, setScaledFile] = useState<File>();
 	const [scaledUrl, setScaledUrl] = useState<string>();
@@ -46,7 +46,7 @@ export default function Component() {
 		if (event.target.files && event.target.files[0]) {
 			const file = event.target.files[0];
 			const file_url = URL.createObjectURL(event.target.files[0]);
-			setFileUrl(file_url);
+			setImageFileUrl(file_url);
 			setImageFile(file);
 		}
 	};
@@ -83,8 +83,8 @@ export default function Component() {
 							</label>
 							<div className="   w-full  flex flex-col  items-center">
 								<button
-									disabled={imageFile != undefined}
-									className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+									disabled={imageFileUrl.length <= 0}
+									className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-gray-100 hover:text-accent-foreground"
 									onClick={() => {
 										if (!Number.isInteger(scalePercent)) {
 											toast.warning("Scale wrong");
@@ -104,7 +104,7 @@ export default function Component() {
 						</div>
 						<div className=" w-full h-full flex flex-col justify-center items-center   ">
 							{
-								fileUrl == null ?
+								imageFileUrl == null ?
 									<div className="  h-[400px] w-[400px] overflow-clip   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
 										<Image
 											src={"https://placehold.co/400x300/png?text=Preview%20here"}
@@ -115,7 +115,7 @@ export default function Component() {
 									:
 									<div className="  h-[400px] w-[400px]   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
 										<Image
-											src={fileUrl}
+											src={imageFileUrl}
 											width="400"
 											height="300"
 											alt="Image Preview"
@@ -157,7 +157,7 @@ export default function Component() {
 						</div>
 						<div className=" p-1">
 							<button
-								className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+								className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-gray-100 hover:text-accent-foreground"
 							>
 								Download
 							</button>
