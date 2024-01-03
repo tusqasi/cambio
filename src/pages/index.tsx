@@ -1,10 +1,12 @@
 import Link from "next/link"
 import Image from "next/image"
-import { ChangeEvent, JSX, SVGProps, useState } from "react"
+import { ChangeEvent, JSX, RefObject, SVGProps, useState } from "react"
 import axios from "axios";
 import { Toaster, toast } from "sonner";
+import { useRef } from "react";
+import { MutableRefObject } from "react";
 
-function uploadImage(file: any, setScaledUrl: Function, scale: number) {
+function uploadImage(file: any, setScaledUrl: Function, scale: number, ref: MutableRefObject<HTMLDivElement>) {
 	const formData = new FormData();
 	formData.append("file", file as Blob);
 	console.log(formData);
@@ -31,7 +33,8 @@ function uploadImage(file: any, setScaledUrl: Function, scale: number) {
 
 			let image = new Blob([byteArray], { type: data.data.type });
 			setScaledUrl(URL.createObjectURL(image));
-			toast.success("Resized image")
+			// toast.success("Resized image")
+			ref.current.scrollIntoView({block:"start",  behavior: "smooth" });
 		})
 		.catch((err) => console.error(err));
 }
@@ -40,8 +43,9 @@ export default function Component() {
 	const [imageFileUrl, setImageFileUrl] = useState<string>("");
 	const [imageFile, setImageFile] = useState<File>();
 	// const [scaledFile, setScaledFile] = useState<File>();
-	const [scaledUrl, setScaledUrl] = useState<string>();
+	const [scaledUrl, setScaledUrl] = useState<string>("");
 	const [scalePercent, setScalePercent] = useState<number>(50);
+	const scrollRef = useRef<HTMLDivElement>();
 	const fileAdded = (event: ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files[0]) {
 			const file = event.target.files[0];
@@ -90,12 +94,12 @@ export default function Component() {
 											toast.warning("Scale wrong");
 											return;
 										}
-										if (imageFileUrl == "" ) {
+										if (imageFileUrl == "") {
 											toast.warning("No image file given to upload");
 											return;
 										}
 
-										uploadImage(imageFile, setScaledUrl, scalePercent);
+										uploadImage(imageFile, setScaledUrl, scalePercent, scrollRef);
 									}}
 								>
 									Resize
@@ -104,7 +108,7 @@ export default function Component() {
 						</div>
 						<div className=" w-full h-full flex flex-col justify-center items-center   ">
 							{
-								imageFileUrl == null ?
+								imageFileUrl == "" ?
 									<div className="  h-[400px] w-[400px] overflow-clip   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
 										<Image
 											src={"https://placehold.co/400x300/png?text=Preview%20here"}
@@ -128,13 +132,14 @@ export default function Component() {
 					</div>
 					<div className=" p-3 ">
 					</div>
-					<div className=" flex flex-col justify-center items-center rounded-xl border  text-card-foreground shadow-sm p-4 ">
+					<div className=" flex flex-col justify-center items-center rounded-xl border  text-card-foreground shadow-sm p-4 "
+						ref={scrollRef}>
 						<div className="flex flex-col justify-start items-start w-full p-3 ">
 							<span className="text-2xl font-semibold  ">Processed Image</span>
 						</div>
 						<div className=" w-full h-full  flex flex-col justify-center items-center   ">
 							{
-								scaledUrl == null ?
+								scaledUrl == "" ?
 									<div className="  h-[400px] w-[400px] overflow-clip   rounded-xl p-2 bg-slate-100 flex flex-col justify-center items-center border border-zinc-200  ">
 										<Image
 											src={"https://placehold.co/400x300/png?text=Processed%20Preview%20Here"}
@@ -157,7 +162,17 @@ export default function Component() {
 						</div>
 						<div className=" p-1">
 							<button
+								disabled={scaledUrl == ""}
 								className=" p-3 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  border border-input bg-background hover:bg-gray-100 hover:text-accent-foreground"
+								onClick={() => {
+									if (!scaledUrl || !imageFile)
+										return;
+									const link = document.createElement("a");
+									link.href = scaledUrl;
+									link.setAttribute("download", `resized_${imageFile.name}`); //or any other extension
+									document.body.appendChild(link);
+									link.click();
+								}}
 							>
 								Download
 							</button>
